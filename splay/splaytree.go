@@ -2,7 +2,6 @@ package splay
 
 import (
 	"cmp"
-	"fmt"
 )
 
 // SplayTree where the most recently accessed node is rotated to the root. A splay tree does
@@ -56,10 +55,7 @@ func (t *Tree[E]) Insert(value E) {
 }
 
 func (t *Tree[E]) InsertAll(values ...E) {
-	for i, v := range values {
-		if i == 2 {
-			fmt.Println("last")
-		}
+	for _, v := range values {
 		t.Insert(v)
 	}
 }

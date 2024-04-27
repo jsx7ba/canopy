@@ -4,6 +4,31 @@ import (
 	"cmp"
 )
 
+// TraversalOrder Constants for defining how the tree is traversed.
+type TraversalOrder uint8
+
+const (
+	PreOrder TraversalOrder = iota
+	PostOrder
+	InOrder
+	BreadthFirst
+)
+
+func (t TraversalOrder) String() string {
+	var s string
+	switch t {
+	case PreOrder:
+		s = "PreOrder"
+	case PostOrder:
+		s = "PostOrder"
+	case InOrder:
+		s = "InOrder"
+	case BreadthFirst:
+		s = "BreadthFirst"
+	}
+	return s
+}
+
 type Node[E cmp.Ordered] struct {
 	value  E
 	parent *Node[E]
@@ -15,7 +40,7 @@ type Tree[E cmp.Ordered] struct {
 	root *Node[E]
 }
 
-func NewTree[E cmp.Ordered]() *Tree[E] {
+func NewBinarySearchTree[E cmp.Ordered]() *Tree[E] {
 	return new(Tree[E])
 }
 
@@ -131,10 +156,45 @@ func (t *Tree[E]) Delete(value E) {
 		return false
 	}
 
-	recurse(t.root, deleter)
+	preOrderTraverse(t.root, deleter)
 }
 
-func recurse[E cmp.Ordered](node *Node[E], v Visitor[E]) {
+func postOrderTraverse[E cmp.Ordered](node *Node[E], v Visitor[E]) bool {
+	if node == nil {
+		return true
+	}
+
+	if !postOrderTraverse(node.left, v) {
+		return false
+	}
+
+	if !postOrderTraverse(node.right, v) {
+		return false
+	}
+	return v(node)
+}
+
+func inOrderTraverse[E cmp.Ordered](node *Node[E], v Visitor[E]) bool {
+	if node == nil {
+		return true
+	}
+
+	if !inOrderTraverse(node.left, v) {
+		return false
+	}
+
+	if !v(node) {
+		return false
+	}
+
+	if !inOrderTraverse(node.right, v) {
+		return false
+	}
+
+	return true
+}
+
+func preOrderTraverse[E cmp.Ordered](node *Node[E], v Visitor[E]) {
 	if node == nil {
 		return
 	}
@@ -143,8 +203,33 @@ func recurse[E cmp.Ordered](node *Node[E], v Visitor[E]) {
 		return
 	}
 
-	recurse(node.left, v)
-	recurse(node.right, v)
+	preOrderTraverse(node.left, v)
+	preOrderTraverse(node.right, v)
+}
+
+func breadthFirstTraverse[E cmp.Ordered](node *Node[E], v Visitor[E]) {
+	nodes := make([]*Node[E], 1)
+
+	nodes[0] = node
+
+	for {
+		children := make([]*Node[E], 0)
+		for _, n := range nodes {
+			if !v(n) {
+				return
+			}
+			if n.left != nil {
+				children = append(children, n.left)
+			}
+			if n.right != nil {
+				children = append(children, n.right)
+			}
+		}
+		if len(children) == 0 {
+			break
+		}
+		nodes = children
+	}
 }
 
 // Visitor A function applied to each node in the tree.
@@ -152,8 +237,17 @@ func recurse[E cmp.Ordered](node *Node[E], v Visitor[E]) {
 type Visitor[E cmp.Ordered] func(node *Node[E]) bool
 
 // Visit Applies a Visitor function to each node in the tree.
-func (t *Tree[E]) Visit(v Visitor[E]) {
-	recurse(t.root, v)
+func (t *Tree[E]) Visit(traversal TraversalOrder, v Visitor[E]) {
+	switch traversal {
+	case PreOrder:
+		preOrderTraverse(t.root, v)
+	case PostOrder:
+		postOrderTraverse(t.root, v)
+	case InOrder:
+		inOrderTraverse(t.root, v)
+	case BreadthFirst:
+		breadthFirstTraverse(t.root, v)
+	}
 }
 
 // Find Returns true if the tree contains value.
@@ -166,6 +260,6 @@ func (t *Tree[E]) Find(value E) bool {
 		}
 		return true
 	}
-	t.Visit(finder)
+	t.Visit(PreOrder, finder)
 	return found
 }

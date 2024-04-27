@@ -7,7 +7,7 @@ import (
 
 // SplayTree where the most recently accessed node is rotated to the root. A splay tree does
 // not have to be in strict balance.
-type SplayTree[E cmp.Ordered] struct {
+type Tree[E cmp.Ordered] struct {
 	root *Node[E]
 }
 
@@ -18,11 +18,11 @@ type Node[E cmp.Ordered] struct {
 	right  *Node[E]
 }
 
-func NewSplayTree[E cmp.Ordered]() *SplayTree[E] {
-	return &SplayTree[E]{}
+func NewSplayTree[E cmp.Ordered]() *Tree[E] {
+	return &Tree[E]{}
 }
 
-func (t *SplayTree[E]) Insert(value E) {
+func (t *Tree[E]) Insert(value E) {
 	node := &Node[E]{
 		value: value,
 	}
@@ -55,7 +55,7 @@ func (t *SplayTree[E]) Insert(value E) {
 	t.splay(node)
 }
 
-func (t *SplayTree[E]) InsertAll(values ...E) {
+func (t *Tree[E]) InsertAll(values ...E) {
 	for i, v := range values {
 		if i == 2 {
 			fmt.Println("last")
@@ -64,26 +64,28 @@ func (t *SplayTree[E]) InsertAll(values ...E) {
 	}
 }
 
-func (t *SplayTree[E]) Delete(value E) {
+func (t *Tree[E]) Delete(value E) {
 
 }
 
-func (t *SplayTree[E]) Find(value E) bool {
-	var found *Node[E]
+// Find - Returns true if the tree contains value.  Note that the tree will splay on the node
+// containing the value, and in the case the value isn't found, on the leaf node with the closest value.
+func (t *Tree[E]) Find(value E) bool {
+	var node *Node[E]
 	finder := func(n *Node[E]) bool {
-		if n.value == value {
-			found = n
+		if n.value == value || (n.left == nil && n.right == nil) {
+			node = n
 			return false
 		}
 		return true
 	}
 	traverse(t.root, finder)
-	t.splay(found)
-	return found != nil
+	t.splay(node)
+	return node.value == value
 }
 
 // rotate the tree until n is the root node
-func (t *SplayTree[E]) splay(n *Node[E]) {
+func (t *Tree[E]) splay(n *Node[E]) {
 	for n != t.root {
 		haveGrandparent := n.parent != nil && n.parent.parent != nil
 		if haveGrandparent {
@@ -104,7 +106,7 @@ func (t *SplayTree[E]) splay(n *Node[E]) {
 	}
 }
 
-func (t *SplayTree[E]) trinodeLeft(n, p, gp *Node[E]) {
+func (t *Tree[E]) trinodeLeft(n, p, gp *Node[E]) {
 	p.right = n.left
 	n.parent = gp.parent
 	gp.parent = n
@@ -119,7 +121,7 @@ func (t *SplayTree[E]) trinodeLeft(n, p, gp *Node[E]) {
 	}
 }
 
-func (t *SplayTree[E]) trinodeRight(n, p, gp *Node[E]) {
+func (t *Tree[E]) trinodeRight(n, p, gp *Node[E]) {
 	p.left = n.right
 	n.parent = gp.parent
 	gp.parent = n
@@ -134,7 +136,7 @@ func (t *SplayTree[E]) trinodeRight(n, p, gp *Node[E]) {
 	}
 }
 
-func (t *SplayTree[E]) zigzig(n *Node[E]) {
+func (t *Tree[E]) zigzig(n *Node[E]) {
 	p := n.parent
 	gp := n.parent.parent
 
@@ -167,7 +169,7 @@ func (t *SplayTree[E]) zigzig(n *Node[E]) {
 	}
 }
 
-func (t *SplayTree[E]) zigzag(n *Node[E]) {
+func (t *Tree[E]) zigzag(n *Node[E]) {
 	gp := n.parent.parent
 	p := n.parent
 
@@ -186,7 +188,7 @@ func (t *SplayTree[E]) zigzag(n *Node[E]) {
 	}
 }
 
-func (t *SplayTree[E]) rotateLeft(n *Node[E]) {
+func (t *Tree[E]) rotateLeft(n *Node[E]) {
 	p := n.parent
 	n.parent = p.parent
 	if p.parent != nil {
@@ -209,7 +211,7 @@ func (t *SplayTree[E]) rotateLeft(n *Node[E]) {
 	n.left = p
 }
 
-func (t *SplayTree[E]) rotateRight(n *Node[E]) {
+func (t *Tree[E]) rotateRight(n *Node[E]) {
 	p := n.parent
 	n.parent = p.parent
 	if p.parent != nil {
@@ -234,7 +236,7 @@ func (t *SplayTree[E]) rotateRight(n *Node[E]) {
 
 type Visitor[E cmp.Ordered] func(n *Node[E]) bool
 
-func (t *SplayTree[E]) Visit(v Visitor[E]) {
+func (t *Tree[E]) Visit(v Visitor[E]) {
 	traverse(t.root, v)
 }
 

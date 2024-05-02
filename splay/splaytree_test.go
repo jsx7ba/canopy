@@ -66,6 +66,7 @@ func TestLargerTree(t *testing.T) {
 	tree := NewSplayTree[int]()
 	//
 	tree.InsertAll(4, 5, 6, 2, 1, 20, 17, 22, 18)
+	PrintTree(tree)
 
 	if !tree.Find(1) {
 		t.Error("could not find 1 in splay tree")
@@ -76,7 +77,8 @@ func TestLargerTree(t *testing.T) {
 	}
 
 	if !tree.Find(17) {
-		t.Error("could not find 1 in splay tree")
+		PrintTree(tree)
+		t.Error("could not find 17 in splay tree")
 	}
 
 	// 17 should be the first node now
@@ -87,6 +89,7 @@ func TestLargerTree(t *testing.T) {
 	}
 	tree.Visit(v)
 	if calls != 1 {
+		PrintTree(tree)
 		t.Error("17 was not at the top of the tree")
 	}
 }
@@ -129,4 +132,52 @@ func TestNotFound(t *testing.T) {
 	tree.Visit(visitor)
 
 	arrayEquals(t, "", expected, actual)
+}
+
+func TestDeleteRoot(t *testing.T) {
+	tree := NewSplayTree[int]()
+	tree.Insert(42)
+	tree.Delete(42)
+}
+
+func TestDeleteChild1(t *testing.T) {
+	tree := NewSplayTree[int]()
+	tree.InsertAll(42, 44, 32)
+	tree.Delete(42)
+}
+
+func TestDeleteLeaf(t *testing.T) {
+	tree := NewSplayTree[int]()
+	tree.InsertAll(42, 44, 32)
+	tree.Delete(44)
+}
+
+func TestDeleteInLargerTree(t *testing.T) {
+	tree := NewSplayTree[int]()
+	tree.InsertAll(4, 5, 6, 2, 1, 20)
+	tree.Delete(2)
+	PrintTree(tree)
+}
+
+func TestDeleteInBigTree(t *testing.T) {
+	values := []int{
+		3, 36, 93, 61, 23, 83, 6, 25, 13, 66,
+		39, 63, 30, 20, 19, 21, 78, 72, 46, 40,
+		92, 84, 47, 24, 58, 89, 96, 26, 53, 98,
+		9, 10, 45, 11, 79, 55, 42, 90, 37, 17,
+		86, 12, 76, 28, 65, 99, 70, 44, 100,
+		29, 43, 87, 56, 51, 95, 7, 5, 50,
+	}
+	tree := NewSplayTree[int]()
+	tree.InsertAll(values...)
+	tree.Delete(3)
+	PrintTree(tree)
+}
+
+func PrintTree[E cmp.Ordered](tree *Tree[E]) {
+	visitor := func(n *Node[E]) bool {
+		fmt.Println(n.value)
+		return true
+	}
+	tree.Visit(visitor)
 }

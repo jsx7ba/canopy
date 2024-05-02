@@ -4,7 +4,7 @@ import (
 	"cmp"
 )
 
-// SplayTree where the most recently accessed node is rotated to the root. A splay tree does
+// Tree A splay tree where the most recently accessed node is rotated to the root. A splay tree does
 // not have to be in strict balance.
 type Tree[E cmp.Ordered] struct {
 	root *Node[E]
@@ -60,29 +60,82 @@ func (t *Tree[E]) InsertAll(values ...E) {
 	}
 }
 
+// Delete Remove nodes from the splay tree.
+// Based off the wikipedia description: https://en.wikipedia.org/wiki/Splay_tree#Deletion
 func (t *Tree[E]) Delete(value E) {
+	node := find(t.root, value)
+	t.splay(node)
 
+	if node.value != value {
+		return
+	}
+
+	left := node.left
+	right := node.right
+
+	// unlink the node
+	node.left = nil
+	node.right = nil
+
+	// connect the subtrees
+	var smax *Node[E] = nil
+	if left != nil {
+		left.parent = nil
+		smax = subtreeMax(left)
+		t.splay(smax)
+	}
+
+	if right != nil {
+		right.parent = nil
+		if left != nil {
+			smax.right = right
+		} else {
+			t.root = right
+		}
+		right.parent = smax
+	}
+}
+
+func subtreeMax[E cmp.Ordered](n *Node[E]) *Node[E] {
+	for n.right != nil {
+		n = n.right
+	}
+	return n
 }
 
 // Find - Returns true if the tree contains value.  Note that the tree will splay on the node
 // containing the value, and in the case the value isn't found, on the leaf node with the closest value.
 func (t *Tree[E]) Find(value E) bool {
-	var node *Node[E]
-	finder := func(n *Node[E]) bool {
-		if n.value == value || (n.left == nil && n.right == nil) {
-			node = n
-			return false
-		}
-		return true
-	}
-	traverse(t.root, finder)
+	node := find(t.root, value)
 	t.splay(node)
 	return node.value == value
+}
+
+// common implementation between find and delete
+func find[E cmp.Ordered](node *Node[E], value E) *Node[E] {
+	for node != nil && value != node.value {
+		if value < node.value {
+			if node.left == nil {
+				break
+			}
+			node = node.left
+		} else {
+			if node.right == nil {
+				break
+			}
+			node = node.right
+		}
+	}
+	return node
 }
 
 // rotate the tree until n is the root node
 func (t *Tree[E]) splay(n *Node[E]) {
 	for n != t.root {
+		if n.parent == nil {
+			t.root = n
+			break
+		}
 		haveGrandparent := n.parent != nil && n.parent.parent != nil
 		if haveGrandparent {
 			p := n.parent
@@ -104,11 +157,20 @@ func (t *Tree[E]) splay(n *Node[E]) {
 
 func (t *Tree[E]) trinodeLeft(n, p, gp *Node[E]) {
 	p.right = n.left
+	if n.left != nil {
+		n.left.parent = p
+	}
 	n.parent = gp.parent
 	gp.parent = n
 	gp.left = n.right
+	if n.right != nil {
+		n.right.parent = gp
+	}
 	p.parent = n
 
+	if n.right != nil {
+		n.right.parent = gp
+	}
 	n.right = gp
 	n.left = p
 
@@ -119,11 +181,20 @@ func (t *Tree[E]) trinodeLeft(n, p, gp *Node[E]) {
 
 func (t *Tree[E]) trinodeRight(n, p, gp *Node[E]) {
 	p.left = n.right
+	if n.right != nil {
+		n.right.parent = p
+	}
 	n.parent = gp.parent
 	gp.parent = n
 	gp.right = n.left
+	if n.left != nil {
+		n.left.parent = gp
+	}
 	p.parent = n
 
+	if n.left != nil {
+		n.left.parent = gp
+	}
 	n.left = gp
 	n.right = p
 
@@ -132,6 +203,7 @@ func (t *Tree[E]) trinodeRight(n, p, gp *Node[E]) {
 	}
 }
 
+// Restructure a left child of a left child to a right child of a right child, or vise versa.
 func (t *Tree[E]) zigzig(n *Node[E]) {
 	p := n.parent
 	gp := n.parent.parent
@@ -150,13 +222,25 @@ func (t *Tree[E]) zigzig(n *Node[E]) {
 
 	if n == p.right {
 		gp.right = p.left
+		if p.left != nil {
+			p.left.parent = gp
+		}
 		p.left = gp
 		p.right = n.left
+		if n.left != nil {
+			n.left.parent = p
+		}
 		n.left = p
 	} else {
 		gp.left = p.right
+		if p.right != nil {
+			p.right.parent = gp
+		}
 		p.right = gp
 		p.left = n.right
+		if n.right != nil {
+			n.right.parent = p
+		}
 		n.right = p
 	}
 
@@ -165,11 +249,13 @@ func (t *Tree[E]) zigzig(n *Node[E]) {
 	}
 }
 
+// Restructure a left child of a right child or vise versa.
 func (t *Tree[E]) zigzag(n *Node[E]) {
 	gp := n.parent.parent
 	p := n.parent
 
 	if gp.parent != nil {
+		n.parent = gp.parent
 		if gp.parent.left == gp {
 			gp.parent.left = n
 		} else {
@@ -236,15 +322,22 @@ func (t *Tree[E]) Visit(v Visitor[E]) {
 	traverse(t.root, v)
 }
 
-func traverse[E cmp.Ordered](n *Node[E], v Visitor[E]) {
+func traverse[E cmp.Ordered](n *Node[E], v Visitor[E]) bool {
 	if n == nil {
-		return
+		return true
 	}
 
 	if !v(n) {
-		return
+		return false
 	}
 
-	traverse(n.left, v)
-	traverse(n.right, v)
+	if !traverse(n.left, v) {
+		return false
+	}
+
+	if !traverse(n.right, v) {
+		return false
+	}
+
+	return true
 }

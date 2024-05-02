@@ -7,7 +7,7 @@ import (
 )
 
 func TestDepthTraversal(t *testing.T) {
-	tree := NewBinarySearchTree[int]()
+	tree := New[int]()
 	tree.Insert(1)
 	tree.Insert(0)
 	tree.Insert(2)
@@ -41,7 +41,7 @@ func TestFind(t *testing.T) {
 }
 
 func TestInOrderSuccessor(t *testing.T) {
-	tree := NewBinarySearchTree[int]()
+	tree := New[int]()
 	tree.InsertAll(20, 8, 22, 4, 12, 10, 14)
 	type data struct {
 		val  int
@@ -84,7 +84,7 @@ func TestDeleteLeaf(t *testing.T) {
 	expected := []int{1, 0}
 	actual := make([]int, len(expected))
 
-	tree := NewBinarySearchTree[int]()
+	tree := New[int]()
 	tree.InsertAll(data...)
 
 	tree.Delete(2)
@@ -106,7 +106,7 @@ func TestDeleteInternal(t *testing.T) {
 	actual := make([]int, len(expected))
 	index := 0
 
-	tree := NewBinarySearchTree[int]()
+	tree := New[int]()
 	tree.InsertAll(data...)
 
 	tree.Delete(6)
@@ -127,7 +127,7 @@ func TestDeleteRoot(t *testing.T) {
 	actual := make([]int, len(expected))
 	index := 0
 
-	tree := NewBinarySearchTree[int]()
+	tree := New[int]()
 	tree.InsertAll(data...)
 
 	tree.Delete(20)
@@ -151,7 +151,7 @@ func TestTraversal(t *testing.T) {
 		BreadthFirst: {100, 20, 200, 10, 30, 150, 300},
 	}
 
-	tree := NewBinarySearchTree[int]()
+	tree := New[int]()
 	tree.InsertAll(data...)
 
 	actual := make([]int, 0, len(data))

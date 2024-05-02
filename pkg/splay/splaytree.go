@@ -17,20 +17,21 @@ type Node[E cmp.Ordered] struct {
 	right  *Node[E]
 }
 
-func NewSplayTree[E cmp.Ordered]() *Tree[E] {
+func New[E cmp.Ordered]() *Tree[E] {
 	return &Tree[E]{}
 }
 
-func (t *Tree[E]) Insert(value E) {
+func (t *Tree[E]) Insert(value E) bool {
 	node := &Node[E]{
 		value: value,
 	}
 
 	if t.root == nil {
 		t.root = node
-		return
+		return true
 	}
 
+	inserted := true
 	current := t.root
 	for {
 		if value < current.value {
@@ -40,18 +41,22 @@ func (t *Tree[E]) Insert(value E) {
 				break
 			}
 			current = current.left
-		} else {
+		} else if value > current.value {
 			if current.right == nil {
 				current.right = node
 				node.parent = current
 				break
 			}
 			current = current.right
+		} else {
+			inserted = false
+			break
 		}
 	}
 
-	// bring the newly inserted node to the root
-	t.splay(node)
+	t.splay(node) // bring the newly inserted node to the root
+
+	return inserted
 }
 
 func (t *Tree[E]) InsertAll(values ...E) {
@@ -62,12 +67,12 @@ func (t *Tree[E]) InsertAll(values ...E) {
 
 // Delete Remove nodes from the splay tree.
 // Based off the wikipedia description: https://en.wikipedia.org/wiki/Splay_tree#Deletion
-func (t *Tree[E]) Delete(value E) {
+func (t *Tree[E]) Delete(value E) bool {
 	node := find(t.root, value)
 	t.splay(node)
 
 	if node.value != value {
-		return
+		return false
 	}
 
 	left := node.left
@@ -94,6 +99,8 @@ func (t *Tree[E]) Delete(value E) {
 		}
 		right.parent = smax
 	}
+
+	return true
 }
 
 func subtreeMax[E cmp.Ordered](n *Node[E]) *Node[E] {

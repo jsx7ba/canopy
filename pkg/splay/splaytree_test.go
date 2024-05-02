@@ -23,7 +23,7 @@ func arrayEquals[E cmp.Ordered](t *testing.T, prefix string, expected, actual []
 }
 
 func TestRotateLeft(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(1, 2, 3)
 	visitor := func(n *Node[int]) bool {
 		fmt.Println(n.value)
@@ -33,7 +33,7 @@ func TestRotateLeft(t *testing.T) {
 }
 
 func TestRotateRight(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(1, 3, 2)
 	visitor := func(n *Node[int]) bool {
 		fmt.Println(n.value)
@@ -43,7 +43,7 @@ func TestRotateRight(t *testing.T) {
 }
 
 func TestRotation(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(4, 3, 6, 5, 7, 1)
 	visitor := func(n *Node[int]) bool {
 		fmt.Println(n.value)
@@ -53,7 +53,7 @@ func TestRotation(t *testing.T) {
 }
 
 func TestZigZag(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(25, 50, 75, 30)
 	visitor := func(n *Node[int]) bool {
 		fmt.Println(n.value)
@@ -63,7 +63,7 @@ func TestZigZag(t *testing.T) {
 }
 
 func TestLargerTree(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	//
 	tree.InsertAll(4, 5, 6, 2, 1, 20, 17, 22, 18)
 	PrintTree(tree)
@@ -95,7 +95,7 @@ func TestLargerTree(t *testing.T) {
 }
 
 func TestFind(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(25, 50, 75, 30)
 
 	if !tree.Find(30) {
@@ -117,7 +117,7 @@ func TestFind(t *testing.T) {
 
 func TestNotFound(t *testing.T) {
 	expected := []int{75, 50, 30, 25}
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(30, 25, 75, 50)
 
 	if tree.Find(200) {
@@ -135,25 +135,25 @@ func TestNotFound(t *testing.T) {
 }
 
 func TestDeleteRoot(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.Insert(42)
 	tree.Delete(42)
 }
 
 func TestDeleteChild1(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(42, 44, 32)
 	tree.Delete(42)
 }
 
 func TestDeleteLeaf(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(42, 44, 32)
 	tree.Delete(44)
 }
 
 func TestDeleteInLargerTree(t *testing.T) {
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(4, 5, 6, 2, 1, 20)
 	tree.Delete(2)
 	PrintTree(tree)
@@ -168,7 +168,7 @@ func TestDeleteInBigTree(t *testing.T) {
 		86, 12, 76, 28, 65, 99, 70, 44, 100,
 		29, 43, 87, 56, 51, 95, 7, 5, 50,
 	}
-	tree := NewSplayTree[int]()
+	tree := New[int]()
 	tree.InsertAll(values...)
 	tree.Delete(3)
 	PrintTree(tree)

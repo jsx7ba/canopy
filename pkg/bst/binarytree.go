@@ -40,18 +40,18 @@ type Tree[E cmp.Ordered] struct {
 	root *Node[E]
 }
 
-func NewBinarySearchTree[E cmp.Ordered]() *Tree[E] {
+func New[E cmp.Ordered]() *Tree[E] {
 	return new(Tree[E])
 }
 
-func (t *Tree[E]) Insert(value E) {
+func (t *Tree[E]) Insert(value E) bool {
 	n := &Node[E]{
 		value: value,
 	}
 
 	if t.root == nil {
 		t.root = n
-		return
+		return false
 	}
 
 	current := t.root
@@ -72,10 +72,10 @@ func (t *Tree[E]) Insert(value E) {
 			}
 			current = current.right
 		} else {
-			// inserting the same value is a no-op
-			break
+			return false
 		}
 	}
+	return true
 }
 
 func (t *Tree[E]) InsertAll(values ...E) {
@@ -112,51 +112,59 @@ func findInorderSuccessor[E cmp.Ordered](n *Node[E]) *Node[E] {
 	}
 }
 
-func (t *Tree[E]) Delete(value E) {
-	deleter := func(n *Node[E]) bool {
-		if n.value != value {
-			return true
+// A common implementation for Find and Delete.  Returns the node where value is found, or nil if it is not found.
+func find[E cmp.Ordered](node *Node[E], value E) *Node[E] {
+	for node != nil && node.value != value {
+		if value < node.value {
+			node = node.left
+		} else if value > node.value {
+			node = node.right
 		}
+	}
+	return node
+}
 
-		if n.left == nil && n.right == nil { // case 1: leaf n
-			if n.parent.value < n.value {
-				n.parent.right = nil
-			} else {
-				n.parent.left = nil
-			}
-		} else if n.left != nil && n.right != nil { // case 2:  node with two children
-			// swap n with its inorder successor
-			successor := findInorderSuccessor(n)
-
-			// swap values and unlink the successor node
-			n.value = successor.value
-			if successor.value < successor.parent.value {
-				successor.parent.left = nil
-			} else {
-				successor.parent.right = nil
-			}
-			successor.parent = nil
-		} else { // case 3: node one child
-			child := n.left
-			if n.left == nil {
-				child = n.right
-			}
-
-			if n == t.root {
-				t.root = child
-			} else {
-				if n.value < n.parent.value {
-					n.parent.left = child
-				} else {
-					n.parent.right = child
-				}
-			}
-		}
-
+func (t *Tree[E]) Delete(value E) bool {
+	node := find(t.root, value)
+	if node == nil {
 		return false
 	}
 
-	preOrderTraverse(t.root, deleter)
+	if node.left == nil && node.right == nil { // case 1: leaf n
+		if node.parent.value < node.value {
+			node.parent.right = nil
+		} else {
+			node.parent.left = nil
+		}
+	} else if node.left != nil && node.right != nil { // case 2:  node with two children
+		// swap n with its inorder successor
+		successor := findInorderSuccessor(node)
+
+		// swap values and unlink the successor node
+		node.value = successor.value
+		if successor.value < successor.parent.value {
+			successor.parent.left = nil
+		} else {
+			successor.parent.right = nil
+		}
+		successor.parent = nil
+	} else { // case 3: node one child
+		child := node.left
+		if node.left == nil {
+			child = node.right
+		}
+
+		if node == t.root {
+			t.root = child
+		} else {
+			if node.value < node.parent.value {
+				node.parent.left = child
+			} else {
+				node.parent.right = child
+			}
+		}
+	}
+	return true
 }
 
 func postOrderTraverse[E cmp.Ordered](node *Node[E], v Visitor[E]) bool {
@@ -252,14 +260,6 @@ func (t *Tree[E]) Visit(traversal TraversalOrder, v Visitor[E]) {
 
 // Find Returns true if the tree contains value.
 func (t *Tree[E]) Find(value E) bool {
-	found := false
-	finder := func(n *Node[E]) bool {
-		if n.value == value {
-			found = true
-			return false
-		}
-		return true
-	}
-	t.Visit(PreOrder, finder)
-	return found
+	node := find(t.root, value)
+	return node != nil
 }

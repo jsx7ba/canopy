@@ -110,29 +110,3 @@ func TestDeleteBSRoot(t *testing.T) {
 	tree.Traverse(PreOrder[int], v)
 	arrayEquals(t, "", expected, actual)
 }
-
-//func TestBinaryTreeTraversal(t *testing.T) {
-//	data := []int{100, 20, 200, 10, 30, 150, 300}
-//	expected := map[TraversalOrder][]int{
-//		PreOrder:     {100, 20, 10, 30, 200, 150, 300},
-//		PostOrder:    {10, 30, 20, 150, 300, 200, 100},
-//		InOrder:      {10, 20, 30, 100, 150, 200, 300},
-//		BreadthFirst: {100, 20, 200, 10, 30, 150, 300},
-//	}
-//
-//	tree := NewBinarySearchTree[int]()
-//	tree.InsertAll(data...)
-//
-//	actual := make([]int, 0, len(data))
-//	visitor := func(n *BinaryNode[int]) bool {
-//		actual = append(actual, n.value)
-//		return true
-//	}
-//
-//	for k, v := range expected {
-//		tree.Visit(k, visitor)
-//		errorPrefix := fmt.Sprintf("%s:", k)
-//		arrayEquals(t, errorPrefix, v, actual)
-//		actual = actual[:0]
-//	}
-//}

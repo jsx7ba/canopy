@@ -27,10 +27,12 @@ func (n *bsNode[E]) Right() (Node[E], bool) {
 	return n.right, n.right != nil
 }
 
+// BSTree is a binary search tree.
 type BSTree[E cmp.Ordered] struct {
 	root *bsNode[E]
 }
 
+// NewBinarySearchTree creates a binary search tree.
 func NewBinarySearchTree[E cmp.Ordered]() *BSTree[E] {
 	return new(BSTree[E])
 }

@@ -45,7 +45,7 @@ func TestRotateRight(t *testing.T) {
 func TestRotation(t *testing.T) {
 	tree := NewSplayTree[int]()
 	InsertAll(tree, 4, 3, 6, 5, 7, 1)
-	PrintTree(tree)
+	PrintTree[int](tree)
 }
 
 func TestZigZag(t *testing.T) {
@@ -62,7 +62,7 @@ func TestLargerTree(t *testing.T) {
 	tree := NewSplayTree[int]()
 	//
 	InsertAll(tree, 4, 5, 6, 2, 1, 20, 17, 22, 18)
-	PrintTree(tree)
+	PrintTree[int](tree)
 
 	if !tree.Find(1) {
 		t.Error("could not find 1 in splay tree")
@@ -73,7 +73,7 @@ func TestLargerTree(t *testing.T) {
 	}
 
 	if !tree.Find(17) {
-		PrintTree(tree)
+		PrintTree[int](tree)
 		t.Error("could not find 17 in splay tree")
 	}
 
@@ -85,7 +85,7 @@ func TestLargerTree(t *testing.T) {
 	}
 	tree.Traverse(PreOrder[int], v)
 	if calls != 1 {
-		PrintTree(tree)
+		PrintTree[int](tree)
 		t.Error("17 was not at the top of the tree")
 	}
 }
@@ -107,7 +107,7 @@ func TestFind(t *testing.T) {
 	tree.Traverse(PreOrder[int], visitor)
 
 	if calls != 1 {
-		PrintTree(tree)
+		PrintTree[int](tree)
 		t.Error("expected 1 call to find 25, got ", calls)
 	}
 }
@@ -153,7 +153,7 @@ func TestDeleteInLargerTree(t *testing.T) {
 	tree := NewSplayTree[int]()
 	InsertAll(tree, 4, 5, 6, 2, 1, 20)
 	tree.Delete(2)
-	PrintTree(tree)
+	PrintTree[int](tree)
 }
 
 func TestDeleteInBigTree(t *testing.T) {
@@ -168,13 +168,5 @@ func TestDeleteInBigTree(t *testing.T) {
 	tree := NewSplayTree[int]()
 	InsertAll(tree, values...)
 	tree.Delete(3)
-	PrintTree(tree)
-}
-
-func PrintTree[E cmp.Ordered](tree *SplayTree[E]) {
-	visitor := func(n Node[E]) bool {
-		fmt.Println(n.Value())
-		return true
-	}
-	tree.Traverse(PreOrder[E], visitor)
+	PrintTree[int](tree)
 }

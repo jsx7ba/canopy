@@ -15,15 +15,15 @@ func (n *bsNode[E]) Value() E {
 	return n.value
 }
 
-func (n *bsNode[E]) Parent() (Node[E], bool) {
+func (n *bsNode[E]) p() (Node[E], bool) {
 	return n.parent, n.parent != nil
 }
 
-func (n *bsNode[E]) Left() (Node[E], bool) {
+func (n *bsNode[E]) l() (Node[E], bool) {
 	return n.left, n.left != nil
 }
 
-func (n *bsNode[E]) Right() (Node[E], bool) {
+func (n *bsNode[E]) r() (Node[E], bool) {
 	return n.right, n.right != nil
 }
 

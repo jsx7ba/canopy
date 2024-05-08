@@ -16,9 +16,9 @@ type Traverser[E cmp.Ordered] interface {
 // Node is a common interface for all binary tree nodes.
 type Node[E cmp.Ordered] interface {
 	Value() E
-	Parent() (Node[E], bool)
-	Left() (Node[E], bool)
-	Right() (Node[E], bool)
+	p() (Node[E], bool)
+	l() (Node[E], bool)
+	r() (Node[E], bool)
 }
 
 // InsertAll Inserts a slice of values into a given tree.
@@ -30,13 +30,13 @@ func InsertAll[E cmp.Ordered](t canopy.Tree[E], values ...E) {
 
 // PostOrder recursively traverses a binary tree in post order.
 func PostOrder[E cmp.Ordered](node Node[E], v func(node Node[E]) bool) bool {
-	if left, ok := node.Left(); ok {
+	if left, ok := node.l(); ok {
 		if !PostOrder(left, v) {
 			return false
 		}
 	}
 
-	if right, ok := node.Right(); ok {
+	if right, ok := node.r(); ok {
 		if !PostOrder(right, v) {
 			return false
 		}
@@ -48,7 +48,7 @@ func PostOrder[E cmp.Ordered](node Node[E], v func(node Node[E]) bool) bool {
 // InOrder recursively traverses a binary tree "in order".
 func InOrder[E cmp.Ordered](node Node[E], v func(node Node[E]) bool) bool {
 
-	if left, ok := node.Left(); ok {
+	if left, ok := node.l(); ok {
 		if !InOrder(left, v) {
 			return false
 		}
@@ -58,7 +58,7 @@ func InOrder[E cmp.Ordered](node Node[E], v func(node Node[E]) bool) bool {
 		return false
 	}
 
-	if right, ok := node.Right(); ok {
+	if right, ok := node.r(); ok {
 		if !InOrder(right, v) {
 			return false
 		}
@@ -74,13 +74,13 @@ func PreOrder[E cmp.Ordered](node Node[E], v func(node Node[E]) bool) bool {
 		return false
 	}
 
-	if left, ok := node.Left(); ok {
+	if left, ok := node.l(); ok {
 		if !PreOrder(left, v) {
 			return false
 		}
 	}
 
-	if right, ok := node.Right(); ok {
+	if right, ok := node.r(); ok {
 		if !PreOrder(right, v) {
 			return false
 		}
@@ -101,10 +101,10 @@ func BreadthFirst[E cmp.Ordered](node Node[E], v func(node Node[E]) bool) bool {
 				return true
 			}
 
-			if left, ok := n.Left(); ok {
+			if left, ok := n.l(); ok {
 				children = append(children, left)
 			}
-			if right, ok := n.Right(); ok {
+			if right, ok := n.r(); ok {
 				children = append(children, right)
 			}
 		}

@@ -11,7 +11,7 @@ Example usage:
 ```go
 tree := binary.NewBinaryTree[int]()
 binary.InsertAll(tree, 3, 2, 4)
-printer := func(n *Node[int]) bool {
+printer := func(n Node[int]) bool {
 	fmt.Println("node value: ", n.Value())
 	return true
 }

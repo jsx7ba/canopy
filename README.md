@@ -12,8 +12,8 @@ Example usage:
 tree := binary.NewBinarySearchTree[int]()
 binary.InsertAll(tree, 3, 2, 4)
 printer := func(n binary.Node[int]) bool {
-fmt.Println("node value: ", n.Value())
-return true
+    fmt.Println("node value: ", n.Value())
+    return true
 }
 tree.Traverse(binary.InOrder[int], printer)
 ```

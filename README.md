@@ -1,10 +1,6 @@
 # Canopy
 
-A collection of tree data structures.  This is a repo for learning how structure go projects.
-
-## Package binary
-
-Contains a collection of binary trees.
+A collection of binary tree data structures.
 
 Example usage:
 
@@ -22,8 +18,9 @@ tree.Traverse(binary.InOrder[int], printer)
 
 A standard binary search tree.
 
-#### Resources
-* https://www.cs.usfca.edu/~galles/visualization/SplayTree.html
+```go
+tree := canopy.NewBinarySearchTree[int]()
+```
 
 ### Splay Tree
 A Splay Tree is a binary tree which has the following properties:
@@ -31,12 +28,20 @@ A Splay Tree is a binary tree which has the following properties:
 - Not necessarily balanced
 - Any node with the most recent access is brought to the root
 
+```go
+tree := canopy.NewSplayTree[int]()
+```
+
 #### Resources
 * https://www.cs.usfca.edu/~galles/visualization/SplayTree.html
 * Adam Gaweda's [Splay Tree Lectures](https://youtube.com/playlist?list=PLK7dyt8j81q2QUEKr-38V0M8XdGQnAaKr&si=XKuHiiBSI_vT-YuI)
 
 ### Red Black Tree
-A self-balancing binary tree.
+A self-balancing binary tree where each node is colored red or black.
+
+```go
+tree := canopy.NewRedBlackTree[int]()
+```
 
 #### Resources
 https://www.cs.usfca.edu/~galles/visualization/RedBlack.html

@@ -2,7 +2,6 @@ package canopy
 
 import (
 	"cmp"
-	"fmt"
 )
 
 // RBTree a struct for red black trees.
@@ -117,22 +116,17 @@ func (t *RedBlackTree[E]) balance(n *rbNode[E]) {
 
 		if u != nil && u.color == red { // Case 1: The parent color is red, and the uncle color is red
 			recolor1(p, u, gp)
-			fmt.Println("case 1 recolor")
 		} else { // Case 2: the parent color is red and the uncle color is black (or nil)
 			if n == p.right && p == gp.left { // Case 2: n, p and gp make a triangle - rotate around parent
 				t.rotateLeft(p)
-				fmt.Println("case 2 rotate left")
 			} else if n == p.left && p == gp.right {
 				t.rotateRight(p)
-				fmt.Println("case 2 rotate right")
 			} else if n == p.right && p == gp.right { // Case 3: n, p, and gp are in a line: rotate around grandparent
 				t.rotateLeft(gp)
 				recolor3(p, gp)
-				fmt.Println("case 3 rotate left/recolor")
 			} else if n == p.left && p == gp.left {
 				t.rotateRight(gp)
 				recolor3(p, gp)
-				fmt.Println("case 3 rotate right/recolor")
 			}
 		}
 		n = p
